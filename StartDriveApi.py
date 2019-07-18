@@ -68,6 +68,7 @@ class ViewDrive(Frame):
         self.frcompose.pack(side=LEFT, fill=Y)
         self.frcomposeredit=LabelFrame(self.raiz,name='' , bg='lightblue',padx=5,pady =5, text ='Preofertas en Base Datos')
         self.frcomposeredit.pack(side=LEFT,fill=Y)
+        
 
         # frames para poner la fucionalidad del proyecto 
 
@@ -467,6 +468,7 @@ class ViewDrive(Frame):
         self.editactual.delete(END)
         val= self.lbcomposer.get(ACTIVE)
         self.editactual.insert(END,val)
+        
 
 
         
