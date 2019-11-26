@@ -31,7 +31,7 @@ class LabelInput(tk.Frame):
         if self.variable:
             return self.variable.get()
         elif type(self.input) == tk.Text:
-            return self.input.get('1.0', tk.END)
+            return self.input.get('1.0',tk.END)
         else:
             return self.input.get()
 
@@ -51,3 +51,28 @@ class LabelInput(tk.Frame):
         else:
             self.input.delete(0, tk.END)
             self.input.insert(0, value)
+
+    def mark(self,color):
+        self.label.configure(background=color)
+        print(self.label.cget('background'))
+
+
+if __name__ == '__main__':
+    raiz=tk.Tk()
+    s=tk.StringVar()
+    s.set('prueba')
+    li =LabelInput(raiz, 'Hojas', input_var=s,label_args={'background':'green'})
+    print(li.label.configure())
+    li.input.configure(background='red')
+    li.input.update()
+    print(li.input.configure())
+    li.pack(side=tk.BOTTOM)
+    color='red'
+    but= tk.Button(raiz,text='color',command=lambda :li.mark(color))
+    but.pack(side=tk.BOTTOM)
+
+    raiz.mainloop()
+    #li.label.cget(**label_args)
+
+
+    #t= tk.Button(raiz,'Marcar',command= li.mark)
