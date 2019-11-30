@@ -19,6 +19,7 @@ class Proyecto(tk.Frame):
         self.refsitio=refsitio
         self.frediproy=raiz
         self.frediprelproy=raiz
+        self.deatacched={}
 
         self.prelproy={'idprelproyecto':tk.IntVar(),'idsitio':tk.IntVar(),'fechavisita':tk.StringVar(),'url':tk.StringVar(),
         'copy':tk.StringVar(), 'copyofer':tk.StringVar()}
@@ -95,7 +96,50 @@ class Proyecto(tk.Frame):
         lista=enumeradores.copyvaluesdict(self.prelproy)
         self.prelproy['idsitio'].set(salvarprelproyectodb(lista))
         
+    """
+    def muestra_proy(self,event):
+       i=0
+       if isinstance(event,integer):
+           k=event
+       else:
+           k=20
 
+       i+=1
+       li.LabelInput(self.frediproy,'Nombre del Proyecto', input_var=self.proyecto['nomproyecto']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Descripcion', input_class=ttk.Entry,input_var=self.proyecto['descripcion']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,"País",input_class=ttk.Combobox, input_var=self.proyecto['paisproponente'],
+       input_args={"values": ["Argentina", "Australia", "USA","Francia", "Alemania"]}).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Moneda', input_var=self.proyecto['moneda']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,"Nombre Proponente", input_var=self.proyecto['nomproponente']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Proyectos pagados', input_var=self.proyecto['proyectospagados']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Numero Habilidades', input_var=self.proyecto['numhabilidades']).grid(row=i % k,column=(i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Numero Preguntas', input_var=self.proyecto['numpreguntas']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Valor Mínimo', input_var=self.proyecto['valormin']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Valor Máximo', input_var=self.proyecto['valormax']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Fecha Creacion', input_var=self.proyecto['creacion']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Cantidad Ofertas', input_var=self.proyecto['cantofertantes']).grid(row=i % k,column=(i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Oferta Mínima', input_var=self.proyecto['ofertamin']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Oferta Máxima', input_var=self.proyecto['ofertamax']).grid(row=i % k, column= (i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Oferta Promedio', input_var=self.proyecto['ofertapromedio']).grid(row=1 % k,column=(i//k)+1)
+       i+=1
+       li.LabelInput(self.frediproy,'Requisitos Especiales', input_var=self.proyecto['numhabilidades']).grid(row=i % k, column= (i//k)+1)
+       #li.LabelInput(self.frediproy,'Numero Preguntas', input_var=self.proyecto['numpreguntas']).grid(row=19,column=1)
+       #li.LabelInput(self.frediproy,'Cantidad Ofertas', input_var=self.proyecto['cantofertantes']).grid(row=20,column=1)
+    """
     def muestra_proy(self,event):
        li.LabelInput(self.frediproy,'Nombre del Proyecto', input_var=self.proyecto['nomproyecto']).grid(row=1, column=1)
        li.LabelInput(self.frediproy,'Descripcion', input_class=ttk.Entry,input_var=self.proyecto['descripcion']).grid(row=2, 		column=1)
@@ -117,6 +161,29 @@ class Proyecto(tk.Frame):
        li.LabelInput(self.frediproy,'Requisitos Especiales', input_var=self.proyecto['numhabilidades']).grid(row=18,column=1)
        #li.LabelInput(self.frediproy,'Numero Preguntas', input_var=self.proyecto['numpreguntas']).grid(row=19,column=1)
        #li.LabelInput(self.frediproy,'Cantidad Ofertas', input_var=self.proyecto['cantofertantes']).grid(row=20,column=1)
+  
+    def changemaster(self):
+        print(self.Master.get())
+        listtprov=list(self.deatacched(item,'',self.listprel.index(item)))
+        self.deatacched={}# hed.keys())
+        for item in listprov:
+            self.listprel.reattach()
+            # se reatachea el item al list prel y se quita del dccionario
+
+        if self.Master.get()==True: 
+            try:
+                #self.antdeatached=self.deatacched
+                #self.deatacched ={}
+                idsitio=self.refsitio.gridsitio.item(self.refsitio.gridsitio.focus())['values'][0]  
+                for itemid in self.listprel.get_children():
+                    if self.listprel.item(itemid)['values'][1]!=idsitio:  
+                        # en el dicccionario deatached se incluye el iid generdo automatico y el indice
+                        self.deatacched[itemid]=self.listprel.index(itemid)
+                        self.listprel.detach(itemid)                    
+            except:
+                messagebox.showwarning('Advertencia','No ha seleccionado sitio')
+        #listaproy=editprelproyectosdb(id)
+        #self.llenagrid(listaproy)
 
 
        
@@ -133,17 +200,8 @@ class Proyecto(tk.Frame):
                     val.set(fila[f])
                     f+=1
 
-        def changemaster():
-            print(self.Master.get())
-            if self.Master.get()==True: 
-                try:
-                    id=int(self.refsitio.listBox.focus())
-                except:
-                    messagebox.showwarning('Advertencia','No ha seleccionado sitio')
-            else: id=0
-            listaproy=editprelproyectosdb(id)
-            self.llenagrid(listaproy)
-
+ 
+    
                 
       
         self.titleprel = tk.Label(frameshow, text="Proyectos del sitio "+self.nomsitio, font=("Arial",14))
@@ -163,12 +221,15 @@ class Proyecto(tk.Frame):
             else: 
                 self.listprel.column(col,width=80,anchor=tk.W)
             self.listprel.heading(col, text=col)
-        self.but1=tk.Radiobutton(frameshow, text="Sitio", variable=self.Master, value=True, command=changemaster).grid(row=3,column=3)
-        self.but2=tk.Radiobutton(frameshow, text="Todos", variable=self.Master, value=False,command=changemaster).grid(row=3,column=4)
+        self.but1=tk.Radiobutton(frameshow, text="Sitio", variable=self.Master, value=True, command= self.changemaster)
+        self.but1.grid(row=3,column=3)
+        self.but2=tk.Radiobutton(frameshow, text="Todos", variable=self.Master, value=False,command= self.changemaster)
+        self.but2.grid(row=3,column=4)
   
 
         self.butshow=tk.Checkbutton(frameshow,text='Ocultar', variable=self.ocultar,command=self.ocultarlistprel).grid(row=3,column=5)
         self.llenagrid(listaproyectos)
+        
         self.listprel.bind('<<TreeviewSelect>>', selectItem)
 
     def ocultarlistprel(self):

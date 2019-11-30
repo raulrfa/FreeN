@@ -75,7 +75,7 @@ class ViewDrive(Frame):
     def gui_butmenu(self):
         self.sbutmenu=tk.Style()
         self.sbutmenu.theme_use('clam')
-        self.sbutmenu.configure('.',font='Times 12', foreground='yellow',background='blue',state=True)
+        self.sbutmenu.configure('.',font='Times 12', foreground='black',background='blue',state=True)
         self.var_dash=IntVar()
         self.var_dash.set(1)
         self.cb_dashboard =tk.Checkbutton(self.frbutm, name='dash' ,text='Dash', variable=self.var_dash, state='disabled', command=self.cbclickp)
@@ -584,6 +584,7 @@ class ViewDrive(Frame):
         results = self.servicio.files().list(q=query,
             pageSize=80, fields="nextPageToken, files(name, id)").execute()
         items = results.get('files', [])
+        self.lbfile.configure(listvariable=self.listfiles)
         if not items:
             print('No files found.')
         else:
