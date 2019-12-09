@@ -5,7 +5,22 @@ Todo:
 ✔ Hacer la seccion de sitios @started(19-03-22 9:07) @done(19-03-22 12:10) @lasted(3h3m26s)
 ☐ Hacer la sescion de ofertas
 ☐ Ver como se puede heredar de frame y susituir el tk.raiz OJO 12/8: puede trAER PROBLEMAS
-pASAR EL CONTOL DE CASILLAS PARA SITIOS
+☐ ASAR EL CONTOL DE CASILLAS PARA SITIOS
 
 
-Resuelto el problema del eliminado de Worka y creado un sitio de pruebas
+✔ Resuelto el problema del eliminado de Worka y creado un sitio de pruebas @done(19-09-06 12:32) 1 day
+✔ Se mejoro el dieno xe la base de datos @done(19-09-06 12:33)
+☐ GET to pass project offers and / or offers to separate windows
+✔ Control sites master detail projects @done(19-09-09 10:26)
+☐ Give a solution to level problem
+☐ Include the possibility of several clients
+☐ Include the search and copy of the project details in the browser's active page
+☐ Verify that site removal is impeded if there are projects included
+☐ Implement the MVC project in a way that separates the graphic components of the controller
+☐ Study NumPY and include some statistics and plot with it
+✔ Estudio de Plant UML y buscar forma de acrtualizarlo @done(19-09-06 17:34)
+☐ Ver si hay algina posibilidad de eliminar el recorrido de para asignar los valores de sitio en select item 
+✔ problema de que salvaba mal y se perdia en la grid de sitios. Se puso como id el id de ltabla y como iid el numero consecutivo @done(19-09-09 10:47)
+☐ El changemaster estaba copletamente mal
+No se estan editando los proyectos
+☐ No hay forma de eliminar un protecto

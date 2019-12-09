@@ -4,6 +4,10 @@ from tkinter import messagebox
 #from tkintertable.Tables import TableCanvas
 from tkintertable import TableCanvas, TableModel
 import sqlite3 
+from busqproy import Busqproywin
+from gendciturl import Dictofindsel
+from dictsit import elem_sitio
+#from sitio_backend import 
 
 #######################################################
 # 
@@ -60,11 +64,11 @@ class Sitio(tk.LabelFrame):
    
         self.sitio={'idsitio':tk.IntVar() ,"nomsitio":tk.StringVar(),"url":tk.StringVar(),"pais":tk.StringVar(),
         'creacion':tk.StringVar(), 'nivelesdemerito':tk.IntVar(), 'nivelesmembresia':tk.IntVar(),'urlproy': tk.StringVar(),
-        'nombusq': tk.StringVar(),'clavebusq':tk.StringVar(),'notas':tk.StringVar()}
+        'nombusq': tk.StringVar(),'clavebusq':tk.StringVar(),'notas':tk.StringVar(),'xdict':tk.StringVar()}
 
-        self.sitioval={'idsitio':9 ,"nomsitio":'',"url":"www.XXXXXX.com","pais":'USA',
+        self.sitioval={'idsitio':0 ,"nomsitio":'',"url":"www.XXXXXX.com","pais":'USA',
         'creacion':'01/01/2019', 'nivelesdemerito':0, 'nivelesmembresia':1,'urlproy': "www.XXXXXX.com/projects",
-        'nombusq': "raulrfa", "clavebusq":"Karpov75%",'notas':""}
+        'nombusq': "raulrfa", "clavebusq":"Karpov75%",'notas':"",'xdict':''}
 
         
         """ 
@@ -80,7 +84,7 @@ class Sitio(tk.LabelFrame):
         
         self.show_sitio_frame()
         self.muestrasitios(editsitiosdb())
-        self.proy=Proyecto(raiz,"",-1)
+        self.proy=Proyecto(self,-1)
         self.proy.muestraproyectos(self.frlistproy,editprelproyectosdb(0))
        
         self.muestra_but_ctrl()
@@ -110,8 +114,7 @@ class Sitio(tk.LabelFrame):
         self.frbut=tk.Frame(self,bg='yellow')
         self.pack(side=tk.LEFT)
         self.frbutidi =tk.LabelFrame(self.frcheckbut,bg='blue',text='Idiomas',width=25)
-        self.frbutidi.pack(side=tk.TOP,fill=tk.Y)
-        
+        self.frbutidi.pack(side=tk.TOP,fill=tk.Y)        
         self.frbutip =tk.LabelFrame(self.frcheckbut,bg='lightyellow',text="Tipos", width=25)
         self.frbutip.pack(side=tk.TOP,fill=tk.Y)
 
@@ -122,9 +125,7 @@ class Sitio(tk.LabelFrame):
         self.frediprelproy =tk.LabelFrame(self,bg='lightyellow',text="Proyecto y Oferta Preliminar", width=25)
         self.frediprelproy.pack(side=tk.LEFT,fill=tk.Y)
         self.frediproy=tk.LabelFrame(self,bg='lightyellow',text="Proyecto y Oferta", width=25)
-        self.frediproy.pack(side=tk.LEFT,fill=tk.Y)
-
-        
+        self.frediproy.pack(side=tk.LEFT,fill=tk.Y)      
         self.freditbut= tk.Frame(self.fredit,bg='gray')
         #self.freditbut.pack()
         
@@ -137,9 +138,7 @@ class Sitio(tk.LabelFrame):
         self.cb_hab =[]  # habilidades
         self.iv_hab =[] # areas de trabajo
        
-       
-        
-
+  
         
    
 
@@ -178,16 +177,65 @@ class Sitio(tk.LabelFrame):
        li.LabelInput(self.fredit,'Niveles de Merito', input_var=self.sitio['nivelesdemerito']).grid(row=4,column=1)
        li.LabelInput(self.fredit,"Nivel de Suscripcion",input_class=ttk.Combobox, input_var=self.sitio['nivelesmembresia'],
        input_args={"values": ["0", "1", "2","3", "4"]}).grid(row=5,column=1)
-   
        li.LabelInput(self.fredit,'URL de Busquedad de Proyectos', input_var=self.sitio['urlproy']).grid(row=6,column=1)
        li.LabelInput(self.fredit,'Nombre Buquedad', input_var=self.sitio['nombusq']).grid(row=7,column=1)
        li.LabelInput(self.fredit,'Clave de Busquedad', input_var=self.sitio['clavebusq']).grid(row=8,column=1)
        li.LabelInput(self.fredit,'Fecha Creacion', input_var=self.sitio['creacion']).grid(row=9,column=1)
+       li.LabelInput(self.fredit,'Diccionario Busquedad', input_var=self.sitio['xdict']).grid(row=9,column=1)
        self.sitio['notas'].set(li.LabelInput(self.fredit,'Notas', input_class=tk.Text,input_args={"height": 10,"width": 25}).grid(row=10,column=1))
        
        
   
-       
+    def muestra_but_ctrl(self):
+        self.butnuevo= tk.Button(self.frbutsit, bg='cyan',text= 'Nuevo',command=self.nuevo)
+        self.butnuevo.pack(side=tk.TOP, pady=10)
+        self.buteditar= tk.Button(self.frbutsit, bg='cyan',text= 'Editar',command=self.editar)
+        self.buteditar.pack(side=tk.TOP, pady=10)
+        self.butlimpiar= tk.Button(self.frbutsit, bg='cyan',text= ' Limpiar',command=self.limpiar)
+        self.butlimpiar.pack(side=tk.TOP, pady=10) 
+        self.butlborrar= tk.Button(self.frbutsit, bg='cyan',text= 'Borrar',command=self.borrar)
+        self.butlborrar.pack(side=tk.TOP, pady=10) 
+        self.butsalvar= tk.Button(self.frbutsit, bg='cyan',text= ' Salvar',command=self.salvar)
+        self.butsalvar.pack(side=tk.TOP, pady=10) 
+        self.butbuscar= tk.Button(self.frbutsit, bg='gray',text= ' Buscar Proy',command=self.buscar)
+        self.butbuscar.pack(side=tk.TOP, pady=10) 
+        self.butestad= tk.Button(self.frbutsit, bg='gray',text= ' Estadisticas',command=self.estadistica)
+        self.butestad.pack(side=tk.TOP, pady=10) 
+        self.butanalizar= tk.Button(self.frbutsit,bg='gray', text= ' Analizar',command=self.analizar)
+        self.butanalizar.pack(side=tk.TOP, pady=10) 
+        self.butactualizar= tk.Button(self.frbutsit,bg='gray', text= ' Actualizar',command=self.actualizar)
+        self.butactualizar.pack(side=tk.TOP, pady=10) 
+        self.butprelproy= tk.Button(self.frbutsit,bg='yellow', text= 'Preliminar',command=self.creanuevoprel)
+        self.butprelproy.pack(side=tk.TOP, pady=10) 
+        self.butsalvarprelproy= tk.Button(self.frbutsit, bg='yellow',text= 'Salvar Preliminar')
+        self.butsalvarprelproy.pack(side=tk.TOP, pady=10) 
+        self.buteliminarprelproy= tk.Button(self.frbutsit, bg='yellow',text= 'Eliminar Preliminar')
+        self.buteliminarprelproy.pack(side=tk.TOP, pady=10) 
+        self.butproyecto= tk.Button(self.frbutsit, bg='green',text= ' Proyecto')
+        self.butproyecto.pack(side=tk.TOP, pady=10)
+        self.butsalvarproyecto= tk.Button(self.frbutsit, bg='green',text= ' Salvar Proyecto',command=self.salvarproy)
+        self.butsalvarproyecto.pack(side=tk.TOP, pady=10)
+        self.buteliminarproyecto= tk.Button(self.frbutsit, bg='green',text= ' Salvar Proyecto',command=self.eliminarproy)
+        self.buteliminarproyecto.pack(side=tk.TOP, pady=10)
+        self.enablebutpreliminares()
+        
+   
+    def enablebutpreliminares(self):
+        self.butnuevo.configure(bg='red')
+        self.butsalvarprelproy.state=tk.NORMAL
+        self.butprelproy.state=tk.NORMAL        
+        self.buteliminarprelproy.state=tk.NORMAL
+        self.butproyecto.state = tk.DISABLED
+        self.butsalvarproyecto.state = tk.DISABLED
+        self.buteliminarproyecto.state = tk.DISABLED
+
+    def enablebutproyectos(self):
+        self.butprelproy.state=tk.DISABLED
+        self.butsalvarprelproy.state=tk.DISABLED
+        self.buteliminarprelproy.state=tk.DISABLED
+        self.butproyecto.state = tk.NORMAL
+        self.butsalvarproyecto.state = tk.NORMAL
+        self.buteliminarproyecto.state = tk.NORMAL  
 
     
     def show(self):
@@ -196,8 +244,8 @@ class Sitio(tk.LabelFrame):
         pass
 
     def selectItem(self, event, arg):   # como argumento se pasa la lista de sitios
-        curItem = self.listBox.focus()
-        idsitio=self.listBox.item(curItem)['values'][0]
+        curItem = self.gridsitio.focus()
+        idsitio=self.gridsitio.item(curItem)['values'][0]
         fila=arg[int(curItem)-1]  # los enumeradores y bd el primer rticulo tiene id 1
         f=0
         for val in self.sitio.values():
@@ -209,118 +257,85 @@ class Sitio(tk.LabelFrame):
         setArea=muchosUnsitio(idsitio,enumeradores.AreasTrab,setArea,0) 
         setHab=muchosUnsitio(idsitio,enumeradores.Habilidades,setHab,0) 
 
-        for i in range(len(self.cb_idi)):
+        for i in range(1,len(self.cb_idi)+1):
             if i in setIdioma: 
-                self.iv_idi[i].set(1)
+                self.iv_idi[i-1].set(1)
             else:
-                self.iv_idi[i].set(0)                
-        for i in range(len(self.cb_tip)):
+                self.iv_idi[i-1].set(0)                
+        for i in range(1,len(self.cb_tip)+1):
             if i in setTipos: 
-                self.iv_tip[i].set(1)
+                self.iv_tip[i-1].set(1)
             else:
-                self.iv_tip[i].set(0)  
-        for i in range(len(self.cb_area)):
+                self.iv_tip[i-1].set(0)  
+        for i in range(1,len(self.cb_area)+1):
             if i in setArea: 
-                self.iv_area[i].set(1)
+                self.iv_area[i-1].set(1)
             else:
-                self.iv_area[i].set(0)  
-        for i in range(len(self.cb_hab)):
+                self.iv_area[i-1].set(0)  
+        for i in range(1,len(self.cb_hab)+1):
             if i in setHab:
-                self.iv_hab[i].set(1)
+                self.iv_hab[i-1].set(1)
             else:
-                self.iv_hab[i].set(0)  
-        self.mostrarproyectos(ord)
+                self.iv_hab[i-1].set(0)  
+        #self.actualizar(idsitio)
+        self.proy.changemaster()
            
-    
-    def muestrasitios(self,listasitios):
-         
-        self.TitlistBox = tk.Label(self.frlistsit, text="Sitios Registrados", font=("Arial",16)).grid(row=0, columnspan=11)
+    def creanuevoprel(self):
+        self.frediproy.pack_forget
+        self.proy.nomsitio=self.nomsitio 
+        self.proy.idsitio=self.sitio['idsitio'].get()
+        self.butsalvarprelproy.state=tk.NORMAL
+        self.butsalvarprelproy.bind('<Button-1>',self.proy.salvarprelproy)
+        self.butproyecto.state=tk.NORMAL
+        self.butproyecto.bind('<Button-1>',self.proy.muestra_proy)
+        self.proy.newprelproy()
+
+    def muestrasitios(self,listasitios):         
+        self.Titgridsitio = tk.Label(self.frlistsit, text="Sitios Registrados", font=("Arial",16)).grid(row=0, columnspan=11)
         # create Treeview with 3 columns
-        cols = ('Orden', 'Nombre', 'URL', 'País','Çreación','NivMerito', 'NivMem','URLProy','','','')
+        cols = ('Orden', 'Nombre', 'URL', 'País','Çreación','NivMerito', 'NivMem','URLProy','','','','')
        
-        self.listBox = ttk.Treeview(self.frlistsit, columns=cols, displaycolumns=(0,1,2,3,4,5,6,7), padding=3, show='headings')
-        #listBox[columns]=('size',width=8,anchor='center')
-        for i, (id,name,url,pais,crea,nivmer,nivmemb,urlp,c1,c2,c3) in enumerate(listasitios, start=1):
-            self.listBox.insert("", "end", i,values=(id, name,url,crea,nivmer,nivmemb,urlp))
+        self.gridsitio = ttk.Treeview(self.frlistsit, columns=cols, displaycolumns=(0,1,2,3,4,5,6,7), padding=3, show='headings')
+        #gridsitio[columns]=('size',width=8,anchor='center')
+        for i, (idi,name,url,pais,crea,nivmer,nivmemb,urlp,c1,c2,c3,c4) in enumerate(listasitios, start=1):
+            self.gridsitio.insert("", "end", i,values=(idi, name,url,crea,nivmer,nivmemb,urlp))
         # set column headings
         for col in cols:
             if  cols.index(col) == 0:
-                self.listBox.column(col,width=10,anchor=tk.W)
+                self.gridsitio.column(col,width=10,anchor=tk.W)
             elif cols.index(col) in (5,6):
-                self.listBox.column(col,width=35,anchor=tk.W)
+                self.gridsitio.column(col,width=35,anchor=tk.W)
             else:
-                self.listBox.column(col,width=100,anchor=tk.W)
+                self.gridsitio.column(col,width=100,anchor=tk.W)
             
-            self.listBox.heading(col, text=col)    
-        self.listBox.grid(row=1, column=0, columnspan=11)
-        #self.listBox.bind('<Button-1>', self.selectItem)
-        self.listBox.bind('<<TreeviewSelect>>', lambda event, arg=listasitios: self.selectItem(event,arg))
-
-    
-
-
-        #for col in self.listBox.columns:
-        #    self.sitio[curItem.col.name].set(curItem.col.value)
-          
-
-    def muestra_but_ctrl(self):
-        self.butnuevo= tk.Button(self.frbutsit, bg='cyan',text= 'Nuevo',command=self.nuevo)
-        self.butnuevo.pack(side=tk.TOP, pady=10)
-        self.buteditar= tk.Button(self.frbutsit, bg='cyan',text= 'Editar',command=self.editar)
-        self.buteditar.pack(side=tk.TOP, pady=10)
-        self.butcopiar= tk.Button(self.frbutsit, bg='cyan',text= ' Copiar',command=self.copiar)
-        self.butcopiar.pack(side=tk.TOP, pady=10)
-        self.butlimpiar= tk.Button(self.frbutsit, bg='cyan',text= ' Limpiar',command=self.limpiar)
-        self.butlimpiar.pack(side=tk.TOP, pady=10) 
-        self.butlborrar= tk.Button(self.frbutsit, bg='cyan',text= 'Borrar',command=self.borrar)
-        self.butlborrar.pack(side=tk.TOP, pady=10) 
-        self.butsalvar= tk.Button(self.frbutsit, bg='cyan',text= ' Salvar',command=self.salvar)
-        self.butsalvar.pack(side=tk.TOP, pady=10) 
-        self.butestad= tk.Button(self.frbutsit, bg='orange',text= ' Estadisticas',command=self.estadistica)
-        self.butestad.pack(side=tk.TOP, pady=10) 
-        self.butbuscar= tk.Button(self.frbutsit, bg='orange',text= ' Buscar',command=self.buscar)
-        self.butbuscar.pack(side=tk.TOP, pady=10) 
-        self.butanalizar= tk.Button(self.frbutsit,bg='orange', text= ' Analizar',command=self.analizar)
-        self.butanalizar.pack(side=tk.TOP, pady=10) 
-        self.butmostrarproyectos= tk.Button(self.frbutsit,bg='yellow', text= ' Actualizar',command=self.mostrarproyectos)
-        self.butmostrarproyectos.pack(side=tk.TOP, pady=10) 
-        self.butprelproy= tk.Button(self.frbutsit,bg='yellow', text= 'Preliminar',command=self.creanuevoproyecto)
-        self.butprelproy.pack(side=tk.TOP, pady=10) 
-        self.butsalvarprelproy= tk.Button(self.frbutsit, bg='yellow',text= 'Salvar Preliminar')
-        self.butsalvarprelproy.pack(side=tk.TOP, pady=10) 
-        self.butprelofer= tk.Button(self.frbutsit, bg='yellow',text= ' Proyecto')
-        self.butprelofer.pack(side=tk.TOP, pady=10)
+            self.gridsitio.heading(col, text=col)    
+        self.gridsitio.grid(row=1, column=0, columnspan=11)
+        #self.gridsitio.bind('<Button-1>', self.selectItem)
+        self.gridsitio.bind('<<TreeviewSelect>>', lambda event, arg=listasitios: self.selectItem(event,arg))   
         self.butmostrarofertas= tk.Button(self.frbutsit,bg='magenta', text= 'Ofertas',command=self.mostrarofertas)
         self.butmostrarofertas.pack(side=tk.TOP, pady=10)
-        if self.proy==None:
-            self.butsalvarprelproy.state=tk.DISABLED
-            self.butprelofer.state=tk.DISABLED
-        
 
-    def creanuevoproyecto(self):
-        self.proy=Proyecto(self.frediprelproy,self.nomsitio,self.sitio['idsitio'].get())
-        self.butsalvarprelproy.state=tk.NORMAL
-        self.butsalvarprelproy.bind('<Button-1>',self.proy.salvarprelproy)
-
-        self.butprelofer.state=tk.NORMAL
-        self.butprelofer.bind('<Button-1>',self.proy.muestra_proy)
-        self.proy.newprelproy()
         
+ 
 
     def nuevo(self):
         self.limpiar()
-        for key,val in self.sitio.items():
-            print(key,'Defecto: ',self.sitioval[key])
-            val.set(self.sitioval[key]) # toma el valor por defecto
         last=nuevositiodb()
         self.sitioval['idsitio']=last
         print(self.sitioval['idsitio'])
-        self.muestrasitios(self,editsitiosdb())
-        self.listBox.selection_set(last-1)
+        for key,val in self.sitio.items():
+            print(key,'Defecto: ',self.sitioval[key])
+            val.set(self.sitioval[key]) # toma el valor por defecto
+        #self.muestrasitios(self,editsitiosdb())
+        #self.gridsitio.selection_set(last-1)
         Sitio.cantsitios+=1
 
 
-        
+    def eliminarproy(self)   :
+        pass
+
+    def salvarproy(self):
+        pass
 
        
          
@@ -328,55 +343,24 @@ class Sitio(tk.LabelFrame):
         
                 
     def editar(self):
-        line= self.listBox.curselection()[0]+1
-        print(line)
-        db = sqlite3.connect('freebd.db')
-        curs = db.cursor()
-        # En el filtro debiera ser distinct en el body todos
-        query =" SELECT * FROM  sitios where idsitio={} ".format(line)
-        # query = query + " and tema = "+ 
-        curs.execute(query)
-        lista=curs.fetchall()
-        print(lista)
-        i=0
-        print('Lista y Dicc',len(lista[0]),len(self.sitio))
-        for val in self.sitio.values():
-            if i==range(len(lista[0])): break
-            val.set(lista[0][i])
-            print(i,  "valor es ", lista[0][i])
-            i+=1
-
-        query= " SELECT * FROM  sitioidioma where idsitio={} ".format(line)
-        curs.execute(query)
-        lista=curs.fetchall()
-        print('idioma',lista)
-        for sitidi in lista:
-            print(self.cb_idi[sitidi[1]-1].state())
-            self.iv_idi[sitidi[1]-1].set(1)
-        
-        query= " SELECT * FROM  sitiostipo where idsitio={} ".format(line)
-        curs.execute(query)
-        lista=curs.fetchall()
-        print('tipo',lista)
-        for sitidi in lista:
-            self.iv_tip[sitidi[1]-1].set(1)
-        
+        pass      
         
 
 
-    def mostrarproyectos(self,ord):
-        if self.proy==None:
+    def actualizar(self,ord):
+        if self.sitiochanged==True:
+            listasitios=editsitiosdb()
+            for i, (idi,name,url,pais,crea,nivmer,nivmemb,urlp,c1,c2,c3,c4) in enumerate(listasitios, start=1):
+                self.gridsitio.delete(i)
+                self.gridsitio.insert("", "end", i,values=(idi, name,url,crea,nivmer,nivmemb,urlp))
+        """" Esto estaba pero parede no se usa
             self.proy.muestraproyectos(self.frlistproy, editprelproyectosdb(0) ) 
         elif self.proy.Master.get()==True: 
             # el defecto es false, se muestran todos los proyectos
-            self.proy.llenagrid(editprelproyectosdb(ord))
+            self.proy.llenagrid(editprelproyectosdb(ord)) """
 
-
-    def copiar(self):
-        sitio.tempsitio=self.sitio
-        sitio.tempidiomas=self.cb_idi
-        sitio.temptipos=self.cb_tip
-
+    
+    
     
 
 
@@ -396,34 +380,35 @@ class Sitio(tk.LabelFrame):
             messagebox.showerror('Error','No se pudo salvar el sitio')
             return
         else:
-            self.listBox.item(self.listBox.focus(),value=lista)
+            self.gridsitio.item(self.gridsitio.focus(),value=lista)
         setIdioma=set()
         setTipos=set()
         setArea=set()
         setHab=set()
-        
-        for i in range(len(self.cb_idi)):
-            if self.cb_idi[i].instate(['selected']) : setIdioma.add(i) 
-        for i in range(len(self.cb_tip)):
-            if self.cb_tip[i].instate(['selected']) : setTipos.add(i) 
-        for i in range(len(self.cb_area)):
-            if self.cb_area[i].instate(['selected']) : setArea.add(i) 
-        for i in range(len(self.cb_hab)):
-            if self.cb_hab[i].instate(['selected']) : setHab.add(i)
+        # Los enumeradores parten de 1, el checkbutton es un arreglo que parte de 0
+        for i in range(1,len(self.cb_idi)+1):  
+            if self.cb_idi[i-1].instate(['selected']) : setIdioma.add(i) 
+        for i in range(1,len(self.cb_tip)+1):
+            if self.cb_tip[i-1].instate(['selected']) : setTipos.add(i) 
+        for i in range(1,len(self.cb_area)+1):
+            if self.cb_area[i-1].instate(['selected']) : setArea.add(i) 
+        for i in range(1,len(self.cb_hab)+1):
+            if self.cb_hab[i-1].instate(['selected']) : setHab.add(i)
         muchosUnsitio(id,enumeradores.Idiomas,setIdioma,1) 
         muchosUnsitio(id,enumeradores.TipoProyecto,setTipos,1) 
         muchosUnsitio(id,enumeradores.AreasTrab,setArea,1) 
-        muchosUnsitio(id,enumeradores.Habilidades,setHab,1) 
+        muchosUnsitio(id,enumeradores.Habilidades,setHab,1)
+        self.sitiochanged=True
   
     def limpiar(self):
         for leng in range(1,1+len(enumeradores.Idiomas)):
-            self.cb_idi[leng-1].state(['!alternate'])
+            self.iv_idi[leng-1].set(0)
         for leng in range(1,1+len(enumeradores.TipoProyecto)):
-            self.cb_tip[leng-1].state(['!alternate'])
+            self.iv_tip[leng-1].set(0)
         for leng in range(1,1+len(enumeradores.AreasTrab)):
-            self.cb_area[leng-1].state(['!alternate'])
+            self.iv_area[leng-1].set(0)
         for leng in range(1,1+len(enumeradores.Habilidades)):
-            self.cb_hab[leng-1].state(['!alternate'])
+            self.iv_hab[leng-1].set(0)
 
         
 
@@ -432,34 +417,52 @@ class Sitio(tk.LabelFrame):
                 val.set(0)
             else:
                 val.set('')
+
+        print('limpiar')
                 
     def borrar(self):
-        ind= self.listBox.focus() 
-        line=self.listBox.index(ind) 
-        messagebox.answer = messagebox.askyesnocancel("Atención!","¿Desea borrar el sitio no. {}".format(line))
-        if messagebox.answer:
-            last=deletesitiodb(line)
+        curItem= self.gridsitio.selection() 
+        #curItem2= self.gridsitio.focus()
+        idsitio=self.gridsitio.item(curItem)['values'][0]
+        line=self.gridsitio.index(curItem) 
+        messagebox.answer = messagebox.askyesnocancel("Atención!","¿Desea borrar el sitio no. {}".format(idsitio))
+        if messagebox.answer:           
+            self.gridsitio.selection_set(line)
+            self.gridsitio.delete(curItem)
+            deletesitiodb(idsitio)
             Sitio.cantsitios=-1
-            self.listBox.delete(ind)
-            self.listBox.selection_set(self.listBox.item(last))
+            
+            muchosUnsitio(idsitio,enumeradores.Idiomas,set(),1) 
+            muchosUnsitio(idsitio,enumeradores.TipoProyecto,set(),1) 
+            muchosUnsitio(idsitio,enumeradores.AreasTrab,set(),1) 
+            muchosUnsitio(idsitio,enumeradores.Habilidades,set(),1)
+            #muestrasitios(editsitiosdb())
 
     def estadistica(self):
         messagebox.showinfo('Estadisticas', 'Cantidad de sitios: {}'.format(Sitio.cantsitios))
 
     def mostrarofertas(self):
-        raiz2 = tk.Tk()
+        vd = tk.Toplevel(bg='gray')
         #TODO pr que no reconoce las Control booleanas cdo de llama a una pagina inde[pendiente
-        gd=ViewDrive(raiz,main(),1)
+        gd=ViewDrive(vd,main(),1)
         #gd=ViewDrive(raiz,None,1)
         gd.gui_butmenu()
         gd.gui_oferta_guardada()
         #gd.cambiartit()
         raiz2.mainloop()
-
+ 
     def buscar(self):
-        pass
+        if self.sitio!=None:
+           setIdioma=setTipos=setArea=setHab=[]          
+           #muchosUnsitio(self.sitio['idsitio'],enumeradores.TipoProyecto,setTipos,1) 
+           #muchosUnsitio(self.sitio['idsitio'],enumeradores.AreasTrab,setArea,1) 
+           habilidades=muchosUnsitio(self.sitio['idsitio'].get(),enumeradores.Habilidades,setHab,0) 
+           idioma= muchosUnsitio(self.sitio['idsitio'].get(),enumeradores.Idiomas,setIdioma,0) 
+           bp=Busqproywin(1,self.sitio['idsitio'].get(),self.sitio['nomsitio'].get(),idioma,habilidades,dictsitio.elem_sitio(self.nomsitio),self.sitio['urlproy'].get(),self.sitio['nombusq'].get(),self.sitio['clavebusq'],'freebd.db')
+        
     def analizar(self):
-        pass
+        #def __init__(self,sitio,url,dictini,xdictedit,tipstruct,marked=[]): definicion actual de analizar
+        ds=Dictofindsel(self.nomsitio,self.sitio['urlproy'].get(),elem_sitio('Workana'),elem_sitio(self.sitio['nomsitio']),self.tipositio)
     def cbclick(self):
         pass
 

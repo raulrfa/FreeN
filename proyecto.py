@@ -7,25 +7,26 @@ import sqlite3
 
 import enumeradores
 import LabelInput as li
-from sitio_backend import salvarprelproyectodb, editprelproyectosdb
+from sitio_backend import salvarprelproyectodb, editprelproyectosdb, editproyectosdb
 import datetime
 
 class Proyecto(tk.Frame):
     """Clase para definir los proyectos"""
-    def __init__(self, raiz,refsitio,nomsitio,idsitio):
+    def __init__(self,refsitio,idsitio):
         super(Proyecto,self).__init__()
-        self.nomsitio =nomsitio
+        self.nomsitio =refsitio.nomsitio
         self.idsitio = idsitio
         self.refsitio=refsitio
-        self.frediproy=raiz
-        self.frediprelproy=raiz
+        self.frediproy=refsitio.frediproy
+        self.frediprelproy=refsitio.frediprelproy
+        #self.refsitio.enablebutproyectos()
         self.deatacched={}
 
         self.prelproy={'idprelproyecto':tk.IntVar(),'idsitio':tk.IntVar(),'fechavisita':tk.StringVar(),'url':tk.StringVar(),
-        'copy':tk.StringVar(), 'copyofer':tk.StringVar()}
+        'copy':tk.StringVar(), 'copyofer':tk.StringVar(),'keywords':tk.StringVar()}
 
         self.prelproyval={'idprelproyecto':-1,'idsitio':0,'fechavisita':'','url':'',
-        'copy':'', 'copyofer':''}
+        'copy':'', 'copyofer':'','keywords':''}
 
 
         # se incluye none coo un valor de id nuevo para un proypreliminar
@@ -73,21 +74,26 @@ class Proyecto(tk.Frame):
         self.prelproy['fechavisita'].set(str(datetime.datetime.now())) 
         textaux= 'Proyecto de {} registrado el dia {}'.format(self.nomsitio,self.prelproy['fechavisita'] )
         tk.Label(self.frediprelproy,text=textaux).grid(row=2,column=1)
-        self.prelproyv['url']=li.LabelInput(self.frediprelproy,'Url', input_var=self.prelproy['url'])
+        self.prelproyv['fechavisita']=li.LabelInput(self.frediprelproy,'Fecha', input_var=self.prelproy['fechavisita'])
+        self.prelproyv['fechavisita'].grid(row=3,column=1)
+        self.prelproyv['url']=li.LabelInput(self.frediprelproy,'URL', input_var=self.prelproy['url'])
         self.prelproyv['url'].grid(row=4, column=1)
-        self.prelproyv['copy']=li.LabelInput(self.frediprelproy,'Copia del Proyecto', input_class=tk.Text,input_args={"height": 10,"width": 60})
-        self.prelproyv['copy'].grid(row=6,column=1)
-        self.prelproyv['copyofer']=li.LabelInput(self.frediprelproy,'Copia de la Oferta', input_class=tk.Text,input_args={"height": 10,"width": 60})
-        self.prelproyv['copyofer'].grid(row=18,column=1)
+        self.prelproyv['keywords']=li.LabelInput(self.frediprelproy,'Palabras Claves',input_var=self.prelproy['keywords'])
+        self.prelproyv['keywords'].grid(row=5,column=1)
+        self.prelproyv['copy']=li.LabelInput(self.frediprelproy,'Copia del Proyecto', input_class=tk.Text,input_args={"height": 15,"width": 60})
+        self.prelproyv['copy'].grid(row=6,column=1,rowspan=10)
+        self.prelproyv['copyofer']=li.LabelInput(self.frediprelproy,'Copia de la Oferta', input_class=tk.Text,input_args={"height": 15,"width": 60})
+        self.prelproyv['copyofer'].grid(row=18,column=1,rowspan=10)
         self.prelproyv['copy'].set(self.prelproy['copyofer'].get())
         self.prelproyv['copyofer'].set('END',self.prelproy['copy'].get())
+        
 
     def editprelproy(self):
         #se incluye en este procedimeinto ls varibles derivadas o los etrey ls demas entran como variables de contro de tkinter
-        self.prelproy['idsitio'].set(self.idsitio.get())
+        self.prelproy['idsitio'].set(self.idsitio)
         self.prelproy['fechavisita'].set(str(datetime.datetime.now())) 
-        self.prelproyv['copy'].set(self.prelproy['copy'])
-        self.prelproyv['copyofer'].set(self.prelproy['copyofer'])
+        self.prelproyv['copy'].set(self.prelproy['copy'].get())
+        self.prelproyv['copyofer'].set(self.prelproy['copyofer'].get())
         
     
     def salvarprelproy(self,event):
@@ -163,13 +169,14 @@ class Proyecto(tk.Frame):
        #li.LabelInput(self.frediproy,'Cantidad Ofertas', input_var=self.proyecto['cantofertantes']).grid(row=20,column=1)
   
     def changemaster(self):
-        print(self.Master.get())
-        listtprov=list(self.deatacched(item,'',self.listprel.index(item)))
-        self.deatacched={}# hed.keys())
-        for item in listprov:
-            self.listprel.reattach()
-            # se reatachea el item al list prel y se quita del dccionario
-
+        print(self.Master.get(),self.deatacched)
+        if self.deatacched!={}:
+            listprov=self.deatacched.values()
+            #listtprov=list(self.deatacched(item,'',self.listprel.index(item))) # esto da error parede estaba mal
+            self.deatacched={} # hed.keys())
+            for item in listprov:
+                self.listprel.reattach(item,'',self.listprel.index(item))
+                # se reatachea el item al list prel y se quita del dccionario
         if self.Master.get()==True: 
             try:
                 #self.antdeatached=self.deatacched
@@ -179,40 +186,71 @@ class Proyecto(tk.Frame):
                     if self.listprel.item(itemid)['values'][1]!=idsitio:  
                         # en el dicccionario deatached se incluye el iid generdo automatico y el indice
                         self.deatacched[itemid]=self.listprel.index(itemid)
-                        self.listprel.detach(itemid)                    
+                        self.listprel.detach(itemid)
+                print(self.Master.get(),self.deatacched)
+
             except:
                 messagebox.showwarning('Advertencia','No ha seleccionado sitio')
+        self.changetitles()        
         #listaproy=editprelproyectosdb(id)
         #self.llenagrid(listaproy)
 
 
-       
+    def selectItemprel(self,event, listaproyectos):
+        curItem = self.listprel.focus()
+        #idprelproy=self.listprel.item(curItem)['values'][0]
+        fila=listaproyectos[int(curItem)-1]  # los enumeradores y bd el primer rticulo tiene id 1
+        f=0
+        for val in self.prelproy.values():
+            val.set(fila[f])
+            f+=1
+        self.editprelproy()
 
-  
+    def selectItemproy(self,event, listaproyectos):
+        curItem = self.gridproy.focus()
+        #idprelproy=self.listprel.item(curItem)['values'][0]
+        fila=listaproyectos[int(curItem)-1]  # los enumeradores y bd el primer rticulo tiene id 1
+        f=0
+        for val in self.proyecto.values():
+            val.set(fila[f])
+            f+=1
 
-    def muestraproyectos(self,frameshow,listaproyectos):
-        def selectItem(event):
-                curItem = self.listprel.focus()
-                #idprelproy=self.listprel.item(curItem)['values'][0]
-                fila=listaproyectos[int(curItem)-1]  # los enumeradores y bd el primer rticulo tiene id 1
-                f=0
-                for val in self.prelproy.values():
-                    val.set(fila[f])
-                    f+=1
+            
 
- 
-    
-                
-      
+    def muestraproyectos(self,frameshow,listaproyectos):     
         self.titleprel = tk.Label(frameshow, text="Proyectos del sitio "+self.nomsitio, font=("Arial",14))
         self.titleprel.grid(row=3, column=0)
         self.Master=tk.BooleanVar()
         self.ocultar=tk.IntVar()
         self.ocultar.set(0)
         self.Master.set(False)
-        colspro = ['Orden', '#sitio', 'Fecha','URL','Copy', 'Oferta','','','','','']
-        self.listprel = ttk.Treeview(frameshow, columns=colspro, displaycolumns=(0,1,2,3,4,5),height=8, padding=1, show="headings")
+        self.showproyecto=tk.BooleanVar()
+        self.showproyecto.set(False)
+        #colspro = ['Orden', '#sitio', 'Fecha','URL','Copy', 'Oferta']
+        # columns=colspro, displaycolumns=(0,1,2,3,4,5),  >> pasado a ist proy
+        self.but1=tk.Radiobutton(frameshow, text="Sitio", variable=self.Master, value=True, command= self.changemaster)
+        self.but1.grid(row=3,column=3)
+        self.but2=tk.Radiobutton(frameshow, text="Todos", variable=self.Master, value=False,command= self.changemaster)
+        self.but2.grid(row=3,column=4)
+        self.butshow=tk.Checkbutton(frameshow,text='Ocultar', variable=self.ocultar,command=self.ocultarlistprel).grid(row=3,column=5)
+        self.butproyectos=tk.Checkbutton(frameshow,text='Proyectos', variable=self.showproyecto,command=self.listproy).grid(row=3,column=6)
+        self.listprel = ttk.Treeview(frameshow,height=8, padding=1, show="headings")
         self.listprel.grid(row=4, column=0, columnspan=10)
+        self.configureprel()
+        self.gridproy = ttk.Treeview(frameshow,height=8, padding=1, show="headings")
+        self.gridproy.grid(row=5, column=0, columnspan=10)
+        self.configureproy()
+        self.listproy()
+        #self.llenagrid(listaproyectos) # show.proyecto muestra el proyecto True, False Muestra el preliminar
+        self.listprel.bind('<<TreeviewSelect>>',lambda event,arg=self.listaproyecto: self.selectItemprel(event,arg))
+        self.gridproy.bind('<<TreeviewSelect>>',lambda event,arg=self.listaproyecto: self.selectItemproy(event,arg))
+
+    
+    def configureprel(self):
+        colspro = ['Orden', '#sitio', 'Fecha','URL','Copy', 'Oferta']
+        self.listprel['columns'] =colspro
+        self.listprel['displaycolumns']=(0,1,2,3,4,5)
+        
         for col in colspro:
             if colspro.index(col) in (0,1):
                 self.listprel.column(col,width=15,anchor=tk.W)
@@ -221,35 +259,83 @@ class Proyecto(tk.Frame):
             else: 
                 self.listprel.column(col,width=80,anchor=tk.W)
             self.listprel.heading(col, text=col)
-        self.but1=tk.Radiobutton(frameshow, text="Sitio", variable=self.Master, value=True, command= self.changemaster)
-        self.but1.grid(row=3,column=3)
-        self.but2=tk.Radiobutton(frameshow, text="Todos", variable=self.Master, value=False,command= self.changemaster)
-        self.but2.grid(row=3,column=4)
-  
-
-        self.butshow=tk.Checkbutton(frameshow,text='Ocultar', variable=self.ocultar,command=self.ocultarlistprel).grid(row=3,column=5)
-        self.llenagrid(listaproyectos)
         
-        self.listprel.bind('<<TreeviewSelect>>', selectItem)
-
+    def configureproy(self):
+        colspro = ('idproy','idsit','idclie','nomproy','descr','mon','nompr','paispr','propag','numhab','numpr','valmin','valmax','ofmax','ofmin','ofpr','cantof','reqesp','crea','skills','ratprop','ref')
+        self.gridproy['columns']=colspro
+        self.gridproy['displaycolumns']= (1,3,5,6,7,8,10,11,4)
+        for col in colspro:
+            if colspro.index(col) in (0,1,5):
+                self.gridproy.column(col,width=15,anchor=tk.W)
+            elif colspro.index(col) in (3,6,7,8,9,10,11,13):
+                self.gridproy.column(col,width=80,anchor=tk.W)   
+            elif colspro.index(col)==4: 
+                self.gridproy.column(col,width=200,anchor=tk.W)
+            self.gridproy.heading(col, text=col)
+            print(self.gridproy.column(col))
+        if self.idsitio==-1: self.idsitio=0  # para probar quitar despues
+         
+        
     def ocultarlistprel(self):
         if self.ocultar.get()==1:
             self.listprel.config(height=1)
-            self.refsitio.listBox.config(height=27)
+            self.refsitio.gridsitio.config(height=27)
+            self.gridproy.config(height=1)
         else:
             self.listprel.config(height=18)
-            self.refsitio.listBox.config(height=15)
+            self.gridproy.config(height=18)
+            self.refsitio.gridsitio.config(height=15)
 
+    def changetitles(self):
+        if self.Master==True:
+            var2= ' del sitio '+ self.nomsitio
+        else:
+            var2= ''
+        if self.showproyecto.get()==True:
+            var1='Proyectos'
+        else:
+            var1='Preliminares'
+        self.titleprel['text']= var1 + var2
+
+    
+    def listproy(self):                    
+        if self.showproyecto.get()==True:
+            self.frediprelproy.pack_forget()
+            self.frediproy.pack()
+            self.listprel.grid_forget()
+            self.gridproy.grid(row=5,column=0,columnspan=10)                       
+            self.listaproyecto=  editproyectosdb(self.idsitio)              
+            self.llenagrid (self.listaproyecto)
+
+        else:     
+            
+            self.frediprelproy.pack()
+            self.frediproy.pack_forget()
+            self.listprel.grid(row=4,column=0,columnspan=10)
+            self.gridproy.grid_forget()
+            #self.refsitio.enablebutpreliminares()                      
+            self.listaproyecto=  editprelproyectosdb(self.idsitio)              
+            self.llenagrid (self.listaproyecto) 
+        self.changetitles()
+        
+        
+
+       
+            
     def llenagrid(self, listaproyectos):
-        for row in self.listprel.get_children():
-            self.listprel.delete(row)
-        for i, (id,name,fecha,url,copy,copyofer) in enumerate(listaproyectos, start=1):
-            self.listprel.insert("", "end", i,values=(id, name,fecha,url,copy,copyofer))
+        if self.showproyecto.get()==False:    
+            for i, (id,name,fecha,url,copy,copyofer,keyword) in enumerate(listaproyectos, start=1):
+                print (i,id,name)
+                self.listprel.insert("", "end", i,values=(id,name,fecha,url,copy,copyofer,keyword))
+        else:
+            for i, (idproyecto,idsitio,idcliente,nomproyecto,descripcion,moneda,nomproponente,paisproponente,proyectospagados,numhabilidades,numpreguntas,valormin,valormax,ofertamax,ofertamin,ofertapromedio,cantofertantes,requisitosesp,creacion,skills,ratingproponente,referencia) in enumerate(listaproyectos, start=1):
+                self.gridproy.insert("", "end", i,values=(idproyecto,idsitio,idcliente,nomproyecto,descripcion,moneda,nomproponente,paisproponente,proyectospagados,numhabilidades,numpreguntas,valormin,valormax,ofertamax,ofertamin,ofertapromedio,cantofertantes,requisitosesp,creacion,skills,ratingproponente,referencia))
+
 
 
 if __name__ == '__main__':
     raiz = tk.Tk()
-    b=Proyecto(raiz,None,'Workana',2)
+    b=Proyecto(raiz,-1)
     b.newprelproy()
     #b.muestra_checkbut()
     raiz.mainloop()           
